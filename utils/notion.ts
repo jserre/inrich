@@ -1,4 +1,4 @@
-import { Client } from '@notionhq/client';
+import { Client, isFullDatabase } from '@notionhq/client';
 import { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
 if (!process.env.NOTION_API_KEY) {
@@ -11,9 +11,13 @@ export const notion = new Client({
 
 export async function getDatabaseSchema(databaseId: string): Promise<{ properties: DatabaseObjectResponse['properties'], title: string }> {
   try {
-    const response: DatabaseObjectResponse = await notion.databases.retrieve({
+    const response = await notion.databases.retrieve({
       database_id: databaseId,
     });
+
+    if (!isFullDatabase(response)) {
+      throw new Error('Received incomplete database response');
+    }
     
     return {
       properties: response.properties,
