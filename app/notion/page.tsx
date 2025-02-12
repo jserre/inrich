@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DatabaseObjectResponse, PropertyConfigResponse } from '@notionhq/client/build/src/api-endpoints';
+import { PropertyConfigResponse } from '@notionhq/client/build/src/api-endpoints';
 
 interface SchemaResponse {
   properties: Record<string, PropertyConfigResponse>;
