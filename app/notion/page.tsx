@@ -1,9 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { DatabaseObjectResponse, PropertyConfigResponse } from '@notionhq/client/build/src/api-endpoints';
+
+interface SchemaResponse {
+  properties: Record<string, PropertyConfigResponse>;
+  title: string;
+}
 
 export default function NotionPage() {
-  const [schema, setSchema] = useState<any>(null);
+  const [schema, setSchema] = useState<SchemaResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +40,7 @@ export default function NotionPage() {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Properties:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.entries(schema.properties).map(([key, property]: [string, any]) => (
+          {Object.entries(schema.properties).map(([key, property]: [string, PropertyConfigResponse]) => (
             <div key={key} className="border p-4 rounded-lg">
               <h3 className="font-medium">{key}</h3>
               <p className="text-sm text-gray-600">Type: {property.type}</p>
