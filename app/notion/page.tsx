@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PropertyConfigResponse } from '@notionhq/client/build/src/api-endpoints';
+import { PropertyValue } from '@notionhq/client/build/src/api-endpoints';
 
 interface SchemaResponse {
-  properties: Record<string, PropertyConfigResponse>;
+  properties: Record<string, PropertyValue>;
   title: string;
 }
 
@@ -40,7 +40,7 @@ export default function NotionPage() {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Properties:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.entries(schema.properties).map(([key, property]: [string, PropertyConfigResponse]) => (
+          {Object.entries(schema.properties).map(([key, property]: [string, PropertyValue]) => (
             <div key={key} className="border p-4 rounded-lg">
               <h3 className="font-medium">{key}</h3>
               <p className="text-sm text-gray-600">Type: {property.type}</p>
