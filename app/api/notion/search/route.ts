@@ -60,22 +60,24 @@ export async function GET(request: NextRequest) {
         records,
         title: database.title[0]?.plain_text || 'Untitled'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle Notion API errors
-      if (error?.code === APIErrorCode.ObjectNotFound) {
-        return createErrorResponse('Database not found', 404);
-      }
-      if (error?.code === ClientErrorCode.AuthenticationError) {
-        return createErrorResponse('Invalid Notion API key', 401);
-      }
-      if (error?.code === APIErrorCode.Unauthorized) {
-        return createErrorResponse('You do not have access to this database. Make sure to share it with your integration.', 403);
+      if (error && typeof error === 'object' && 'code' in error) {
+        if (error.code === APIErrorCode.ObjectNotFound) {
+          return createErrorResponse('Database not found', 404);
+        }
+        if (error.code === ClientErrorCode.AuthenticationError) {
+          return createErrorResponse('Invalid Notion API key', 401);
+        }
+        if (error.code === APIErrorCode.Unauthorized) {
+          return createErrorResponse('You do not have access to this database. Make sure to share it with your integration.', 403);
+        }
       }
       // Log unexpected errors but don't expose details to client
       console.error('Notion API error:', error);
       throw error; // Re-throw to be caught by outer catch
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error searching database:', error);
     return createErrorResponse('Failed to search database', 500);
   }
