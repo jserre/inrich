@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
 import { isFullDatabase, isFullPage } from '@notionhq/client';
+import type { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints';
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
           [type]: {
             contains: query
           }
-        };
+        } satisfies QueryDatabaseParameters['filter'] extends { or: (infer T)[] } ? T : never;
       });
 
     if (searchableProperties.length === 0) {
@@ -53,7 +54,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Search records in database
-    // @ts-expect-error - Notion API accepts this filter structure but TypeScript definitions are more restrictive
     const response = await notion.databases.query({
       database_id: databaseId,
       filter: {
