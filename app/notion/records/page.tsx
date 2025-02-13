@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { 
   PageObjectResponse,
   SelectPropertyItemObjectResponse,
@@ -112,7 +113,7 @@ export default function RecordsPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = useSearchParams();
   const databaseId = searchParams.get('id');
 
   const fetchRecords = async (query?: string) => {
