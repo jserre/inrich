@@ -13,6 +13,7 @@ import {
   PhoneNumberPropertyItemObjectResponse,
   RichTextItemResponse
 } from '@notionhq/client/build/src/api-endpoints';
+import { useSearchParams } from 'next/navigation';
 
 type NotionPropertyValue = PageObjectResponse['properties'][string];
 
@@ -108,26 +109,55 @@ function formatPropertyValue(property: NotionPropertyValue): string {
 }
 
 export default function RecordsPage() {
+  const searchParams = useSearchParams();
   const [records, setRecords] = useState<RecordsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout>();
+
+  const fetchRecords = async (query?: string) => {
+    try {
+      setLoading(true);
+      const endpoint = query 
+        ? `/api/notion/search?query=${encodeURIComponent(query)}`
+        : '/api/notion/records';
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error('Failed to fetch records');
+      const data = await response.json();
+      setRecords(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchRecords() {
-      try {
-        const response = await fetch('/api/notion/records');
-        if (!response.ok) throw new Error('Failed to fetch records');
-        const data = await response.json();
-        setRecords(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchRecords();
   }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    if (searchQuery) {
+      const timeout = setTimeout(() => {
+        fetchRecords(searchQuery);
+      }, 500); // 500ms debounce
+      setSearchTimeout(timeout);
+    } else {
+      fetchRecords();
+    }
+
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchQuery]);
 
   if (loading) return <div className="p-4">Loading records...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
@@ -142,30 +172,50 @@ export default function RecordsPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Records: {records.title}</h1>
-      <div className="overflow-x-auto border rounded-lg">
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-50">
-            <tr>
-              {propertyKeys.map(key => (
-                <th key={key} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                  {key}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {records.records.map((record, rowIndex) => (
-              <tr key={record.id} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+      <div className="flex flex-col space-y-4">
+        <h1 className="text-2xl font-bold">Records: {records.title}</h1>
+        
+        {/* Search input */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search records..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {loading && (
+            <div className="absolute right-3 top-2.5">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+        </div>
+
+        {/* Records table */}
+        <div className="overflow-x-auto border rounded-lg">
+          <table className="min-w-full bg-white">
+            <thead className="bg-gray-50">
+              <tr>
                 {propertyKeys.map(key => (
-                  <td key={key} className="px-6 py-4 text-sm text-gray-900 border-b">
-                    {formatPropertyValue(record.properties[key])}
-                  </td>
+                  <th key={key} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                    {key}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {records.records.map((record, rowIndex) => (
+                <tr key={record.id} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  {propertyKeys.map(key => (
+                    <td key={key} className="px-6 py-4 text-sm text-gray-900 border-b">
+                      {formatPropertyValue(record.properties[key])}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
