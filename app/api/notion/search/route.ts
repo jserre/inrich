@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
 import { isFullDatabase, isFullPage } from '@notionhq/client';
-import type { PropertyFilter, QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints';
+import type { PropertyFilter } from '@notionhq/client/build/src/api-endpoints';
 
 export async function GET(request: NextRequest) {
   try {
