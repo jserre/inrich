@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
   PageObjectResponse,
@@ -108,7 +108,7 @@ function formatPropertyValue(property: NotionPropertyValue): string {
   return '';
 }
 
-export default function RecordsPage() {
+function RecordsContent() {
   const [records, setRecords] = useState<RecordsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -134,8 +134,10 @@ export default function RecordsPage() {
   };
 
   useEffect(() => {
-    fetchRecords();
-  }, []);
+    if (databaseId) {
+      fetchRecords();
+    }
+  }, [databaseId]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,5 +219,13 @@ export default function RecordsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecordsPage() {
+  return (
+    <Suspense fallback={<div className="p-4">Loading...</div>}>
+      <RecordsContent />
+    </Suspense>
   );
 }
