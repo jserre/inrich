@@ -2,10 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { 
+  PageObjectResponse,
+  PropertyValueType,
+  RichTextItemResponse,
+  SelectPropertyItemObjectResponse,
+  MultiSelectPropertyItemObjectResponse,
+  DatePropertyItemObjectResponse,
+  NumberPropertyItemObjectResponse,
+  TitlePropertyItemObjectResponse,
+  CheckboxPropertyItemObjectResponse,
+  URLPropertyItemObjectResponse,
+  EmailPropertyItemObjectResponse,
+  PhoneNumberPropertyItemObjectResponse,
+  RichTextPropertyItemObjectResponse
+} from '@notionhq/client/build/src/api-endpoints';
 
 interface NotionRecord {
   id: string;
-  properties: Record<string, any>;
+  properties: PageObjectResponse['properties'];
 }
 
 interface RecordsResponse {
@@ -13,34 +28,71 @@ interface RecordsResponse {
   title: string;
 }
 
-// Simple formatter for different Notion property types
-function formatPropertyValue(property: any): string {
+// Type guard for property values
+function isPropertyType<T extends PropertyValueType>(
+  property: PropertyValueType,
+  type: T['type']
+): property is T {
+  return property.type === type;
+}
+
+// Strongly typed property formatter
+function formatPropertyValue(property: PropertyValueType): string {
   if (!property) return '';
-  
+
   switch (property.type) {
     case 'title':
-      return property.title?.[0]?.plain_text || '';
+      if (isPropertyType<TitlePropertyItemObjectResponse>(property, 'title')) {
+        return property.title[0]?.plain_text || '';
+      }
+      break;
     case 'rich_text':
-      return property.rich_text?.[0]?.plain_text || '';
+      if (isPropertyType<RichTextPropertyItemObjectResponse>(property, 'rich_text')) {
+        return property.rich_text[0]?.plain_text || '';
+      }
+      break;
     case 'number':
-      return property.number?.toString() || '';
+      if (isPropertyType<NumberPropertyItemObjectResponse>(property, 'number')) {
+        return property.number?.toString() || '';
+      }
+      break;
     case 'select':
-      return property.select?.name || '';
+      if (isPropertyType<SelectPropertyItemObjectResponse>(property, 'select')) {
+        return property.select?.name || '';
+      }
+      break;
     case 'multi_select':
-      return property.multi_select?.map((s: any) => s.name).join(', ') || '';
+      if (isPropertyType<MultiSelectPropertyItemObjectResponse>(property, 'multi_select')) {
+        return property.multi_select.map(s => s.name).join(', ');
+      }
+      break;
     case 'date':
-      return property.date?.start || '';
+      if (isPropertyType<DatePropertyItemObjectResponse>(property, 'date')) {
+        return property.date?.start || '';
+      }
+      break;
     case 'checkbox':
-      return property.checkbox ? '✓' : '✗';
+      if (isPropertyType<CheckboxPropertyItemObjectResponse>(property, 'checkbox')) {
+        return property.checkbox ? '✓' : '✗';
+      }
+      break;
     case 'url':
-      return property.url || '';
+      if (isPropertyType<URLPropertyItemObjectResponse>(property, 'url')) {
+        return property.url || '';
+      }
+      break;
     case 'email':
-      return property.email || '';
+      if (isPropertyType<EmailPropertyItemObjectResponse>(property, 'email')) {
+        return property.email || '';
+      }
+      break;
     case 'phone_number':
-      return property.phone_number || '';
-    default:
-      return '';
+      if (isPropertyType<PhoneNumberPropertyItemObjectResponse>(property, 'phone_number')) {
+        return property.phone_number || '';
+      }
+      break;
   }
+  return '';
 }
 
 export default function RecordsPage() {
@@ -74,7 +126,7 @@ export default function RecordsPage() {
   // Get property keys from the first record, excluding internal properties
   const propertyKeys = records.records[0] 
     ? Object.entries(records.records[0].properties)
-        .filter(([_, value]) => value.type !== 'formula' && value.type !== 'rollup')
+        .filter(([, value]) => !['formula', 'rollup'].includes(value.type))
         .map(([key]) => key)
     : [];
 
