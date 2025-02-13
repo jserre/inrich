@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
 
     // Build search filter for all text-based properties
     type PropertyType = 'title' | 'rich_text' | 'url' | 'email' | 'phone_number';
+    type NotionFilter = QueryDatabaseParameters['filter']['or'][number];
     
     const searchableProperties = Object.entries(database.properties)
       .filter(([, prop]) => ['title', 'rich_text', 'url', 'email', 'phone_number'].includes(prop.type))
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
           [type]: {
             contains: query
           }
-        } satisfies QueryDatabaseParameters['filter'] extends { or: (infer T)[] } ? T : never;
+        } satisfies NotionFilter;
       });
 
     if (searchableProperties.length === 0) {
