@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
 import { isFullDatabase, isFullPage } from '@notionhq/client';
-import type { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints';
+import type { PropertyFilter, QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints';
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +32,6 @@ export async function GET(request: NextRequest) {
 
     // Build search filter for all text-based properties
     type PropertyType = 'title' | 'rich_text' | 'url' | 'email' | 'phone_number';
-    type NotionFilter = QueryDatabaseParameters['filter']['or'][number];
     
     const searchableProperties = Object.entries(database.properties)
       .filter(([, prop]) => ['title', 'rich_text', 'url', 'email', 'phone_number'].includes(prop.type))
@@ -43,7 +42,7 @@ export async function GET(request: NextRequest) {
           [type]: {
             contains: query
           }
-        } satisfies NotionFilter;
+        } satisfies PropertyFilter;
       });
 
     if (searchableProperties.length === 0) {
