@@ -42,12 +42,12 @@ function formatPropertyValue(property: NotionPropertyValue): string {
   switch (property.type) {
     case 'title':
       if (isPropertyType<TitlePropertyItemObjectResponse>(property, 'title')) {
-        return property.title[0]?.plain_text || '';
+        return property.title.map(t => t.plain_text).join(' ') || '';
       }
       break;
     case 'rich_text':
       if (isPropertyType<RichTextPropertyItemObjectResponse>(property, 'rich_text')) {
-        return property.rich_text[0]?.plain_text || '';
+        return property.rich_text.map(t => t.plain_text).join(' ') || '';
       }
       break;
     case 'number':
