@@ -1,6 +1,7 @@
-// Notion database IDs are 32-character hex strings
+// Notion database IDs are 32-character hex strings with optional hyphens
 export function isValidDatabaseId(id: string): boolean {
-  return /^[a-f0-9]{32}$/.test(id);
+  // Allow 32 hex chars with optional hyphens between them
+  return /^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/.test(id);
 }
 
 // Search query validation
