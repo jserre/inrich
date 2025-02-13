@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     // Build search filter for all text-based properties
     const searchableProperties = Object.entries(database.properties)
-      .filter(([_, prop]) => ['title', 'rich_text', 'url', 'email', 'phone_number'].includes(prop.type))
+      .filter(([, prop]) => ['title', 'rich_text', 'url', 'email', 'phone_number'].includes(prop.type))
       .map(([name, prop]) => {
         const type = prop.type as 'title' | 'rich_text' | 'url' | 'email' | 'phone_number';
         return {

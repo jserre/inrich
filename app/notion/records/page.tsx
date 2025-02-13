@@ -13,7 +13,6 @@ import {
   PhoneNumberPropertyItemObjectResponse,
   RichTextItemResponse
 } from '@notionhq/client/build/src/api-endpoints';
-import { useSearchParams } from 'next/navigation';
 
 type NotionPropertyValue = PageObjectResponse['properties'][string];
 
@@ -109,7 +108,6 @@ function formatPropertyValue(property: NotionPropertyValue): string {
 }
 
 export default function RecordsPage() {
-  const searchParams = useSearchParams();
   const [records, setRecords] = useState<RecordsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
