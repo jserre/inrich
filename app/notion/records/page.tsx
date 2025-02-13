@@ -123,7 +123,10 @@ function RecordsContent() {
         ? `/api/notion/search?databaseId=${databaseId}&query=${encodeURIComponent(query)}`
         : `/api/notion/records?id=${databaseId}`;
       const response = await fetch(endpoint);
-      if (!response.ok) throw new Error('Failed to fetch records');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch records');
+      }
       const data = await response.json();
       setRecords(data);
     } catch (err) {
