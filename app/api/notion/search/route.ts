@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
 import { isFullDatabase, isFullPage } from '@notionhq/client';
+import { isValidDatabaseId, isValidSearchQuery, createErrorResponse } from '@/utils/validation';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,22 +9,30 @@ export async function GET(request: NextRequest) {
     const databaseId = searchParams.get('databaseId');
     const query = searchParams.get('query');
 
+    // Validate required parameters
     if (!databaseId) {
-      return NextResponse.json({ error: 'Missing database ID' }, { status: 400 });
+      return createErrorResponse('Missing database ID');
     }
 
     if (!query) {
-      return NextResponse.json({ error: 'Missing search query' }, { status: 400 });
+      return createErrorResponse('Missing search query');
+    }
+
+    // Validate database ID format
+    if (!isValidDatabaseId(databaseId)) {
+      return createErrorResponse('Invalid database ID format');
+    }
+
+    // Validate search query
+    if (!isValidSearchQuery(query)) {
+      return createErrorResponse('Invalid search query. Must be between 1 and 100 characters');
     }
 
     // Get database to check if it exists and get its title
     const database = await notion.databases.retrieve({ database_id: databaseId });
 
     if (!isFullDatabase(database)) {
-      return NextResponse.json(
-        { error: 'Invalid database response' },
-        { status: 500 }
-      );
+      return createErrorResponse('Invalid database response', 500);
     }
 
     // Search records in database using title property
@@ -51,9 +60,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error searching database:', error);
-    return NextResponse.json(
-      { error: 'Failed to search database' },
-      { status: 500 }
-    );
+    return createErrorResponse('Failed to search database', 500);
   }
 }
