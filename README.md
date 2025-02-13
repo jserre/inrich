@@ -1,24 +1,27 @@
-# Notion Integration Seed Project
+# Notion Browser
 
-A production-ready Next.js template for integrating with Notion's API, featuring TypeScript, Tailwind CSS, and robust error handling.
+A production-ready Next.js application for browsing and searching Notion databases, featuring TypeScript, Tailwind CSS, and robust error handling.
 
-## Why This Project?
+## Production Status
 
-Building reliable Notion integrations can be challenging due to complex typing requirements and API peculiarities. This seed project provides a battle-tested foundation that:
+This application is **STABLE** and deployed in production. Current stable features include:
 
-- ✅ Implements proper TypeScript types for Notion's API
-- ✅ Handles edge cases and partial responses
-- ✅ Demonstrates clean architecture patterns
-- ✅ Provides production-ready error handling
-- ✅ Shows correct environment variable setup
+### Database Browsing
+- List all accessible Notion databases
+- View database details and structure
+- Navigate between databases seamlessly
 
-## Features
+### Search Functionality
+- Search records by title within any database
+- Real-time search results
+- Clean and intuitive search interface
 
-- **Type-Safe Notion Integration**: Properly typed database schema fetching using `@notionhq/client`
-- **Modern Stack**: Next.js 15+, React 19, TypeScript, and Tailwind CSS
-- **Clean Architecture**: Separation of concerns between UI, API routes, and Notion utilities
-- **Production Ready**: Environment validation, error handling, and proper HTTP status codes
-- **Developer Experience**: Hot reloading, ESLint configuration, and TypeScript strict mode
+## Technical Stack
+
+- **Framework**: Next.js 15+ with App Router
+- **UI**: React 19 with Tailwind CSS
+- **Type Safety**: TypeScript with strict mode
+- **API Integration**: Official Notion Client (@notionhq/client)
 
 ## Getting Started
 
@@ -32,7 +35,6 @@ Building reliable Notion integrations can be challenging due to complex typing r
    ```bash
    # .env.local
    NOTION_API_KEY=your_notion_api_key
-   NOTION_DATABASE_ID=your_database_id
    ```
 
 4. Run the development server:
@@ -40,71 +42,33 @@ Building reliable Notion integrations can be challenging due to complex typing r
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) to view your app
-
 ## Project Structure
 
 ```
-notion-seed/
+notion-browser/
 ├── app/                    # Next.js app directory
 │   ├── api/               # API routes
-│   │   └── notion/       # Notion-specific endpoints
-│   ├── notion/           # Notion database viewer
-│   └── page.tsx          # Home page
-├── utils/
-│   └── notion.ts         # Notion client setup & utilities
-└── .env.local            # Environment variables
+│   │   └── notion/       # Notion endpoints (search, records)
+│   ├── databases/        # Database listing page
+│   └── notion/          # Database viewing and search
+├── utils/                # Shared utilities
+│   └── notion.ts        # Notion client configuration
+└── components/          # Reusable React components
 ```
 
-## Key Implementation Details
+## Key Features
 
-### Notion Client Setup
-```typescript
-// utils/notion.ts
-import { Client, isFullDatabase } from '@notionhq/client';
+### Database Browsing
+- **Database List**: View all accessible Notion databases
+- **Database Details**: Examine database structure and properties
+- **Navigation**: Intuitive links between databases and records
 
-export const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
-});
-```
-
-### Type-Safe Database Queries
-```typescript
-// Proper typing for Notion's database responses
-type NotionPropertyConfig = DatabaseObjectResponse['properties'][string];
-
-// Type guard usage
-if (!isFullDatabase(response)) {
-  throw new Error('Received incomplete database response');
-}
-```
-
-### Error Handling
-- Environment variable validation at startup
-- Type guard checks for API responses
-- Proper error propagation
-- Clean error responses with appropriate HTTP status codes
-
-## Environment Variables
-
-Required environment variables:
-- `NOTION_API_KEY`: Your Notion integration token
-- `NOTION_DATABASE_ID`: ID of the Notion database to connect to
-
-## Common Pitfalls Solved
-
-This seed project addresses several common challenges in Notion integration:
-
-1. **Type Safety**: Proper usage of Notion's TypeScript types
-2. **Partial Responses**: Handling incomplete database responses
-3. **Error States**: Comprehensive error handling throughout the stack
-4. **Configuration**: Clean separation of Notion client setup
-5. **API Design**: Production-ready API route implementation
+### Search Implementation
+- **Title Search**: Fast and reliable search through database titles
+- **Real-time Updates**: Immediate search results as you type
+- **Error Handling**: Robust error handling for API failures
+- **Loading States**: Smooth loading transitions with Suspense
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - feel free to use this seed project as a starting point for your own Notion integrations.
+This project is actively maintained. Feel free to submit issues and pull requests.
