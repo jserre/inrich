@@ -9,7 +9,7 @@ import {
   NumberPropertyItemObjectResponse,
   TitlePropertyItemObjectResponse,
   CheckboxPropertyItemObjectResponse,
-  URLPropertyItemObjectResponse,
+  UrlPropertyItemObjectResponse,
   EmailPropertyItemObjectResponse,
   PhoneNumberPropertyItemObjectResponse,
   RichTextPropertyItemObjectResponse
@@ -76,7 +76,7 @@ function formatPropertyValue(property: NotionPropertyValue): string {
       }
       break;
     case 'url':
-      if (isPropertyType<URLPropertyItemObjectResponse>(property, 'url')) {
+      if (isPropertyType<UrlPropertyItemObjectResponse>(property, 'url')) {
         return property.url || '';
       }
       break;
