@@ -114,7 +114,6 @@ export default function RecordsPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout>();
 
   const fetchRecords = async (query?: string) => {
     try {
@@ -137,27 +136,10 @@ export default function RecordsPage() {
     fetchRecords();
   }, []);
 
-  // Debounced search
-  useEffect(() => {
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-
-    if (searchQuery) {
-      const timeout = setTimeout(() => {
-        fetchRecords(searchQuery);
-      }, 500); // 500ms debounce
-      setSearchTimeout(timeout);
-    } else {
-      fetchRecords();
-    }
-
-    return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-    };
-  }, [searchQuery]);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchRecords(searchQuery);
+  };
 
   if (loading) return <div className="p-4">Loading records...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
@@ -175,21 +157,23 @@ export default function RecordsPage() {
       <div className="flex flex-col space-y-4">
         <h1 className="text-2xl font-bold">Records: {records.title}</h1>
         
-        {/* Search input */}
-        <div className="relative">
+        {/* Search form */}
+        <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
             placeholder="Search records..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {loading && (
-            <div className="absolute right-3 top-2.5">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-            </div>
-          )}
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            {loading ? 'Searching...' : 'Search'}
+          </button>
+        </form>
 
         {/* Records table */}
         <div className="overflow-x-auto border rounded-lg">
