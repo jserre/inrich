@@ -7,15 +7,28 @@ import {
   MultiSelectPropertyItemObjectResponse,
   DatePropertyItemObjectResponse,
   NumberPropertyItemObjectResponse,
-  TitlePropertyItemObjectResponse,
   CheckboxPropertyItemObjectResponse,
   UrlPropertyItemObjectResponse,
   EmailPropertyItemObjectResponse,
   PhoneNumberPropertyItemObjectResponse,
-  RichTextPropertyItemObjectResponse
+  RichTextItemResponse
 } from '@notionhq/client/build/src/api-endpoints';
 
 type NotionPropertyValue = PageObjectResponse['properties'][string];
+
+// Define title property type based on Notion's API
+interface TitlePropertyValue {
+  type: "title";
+  title: RichTextItemResponse[];
+  id: string;
+}
+
+// Define rich text property type based on Notion's API
+interface RichTextPropertyValue {
+  type: "rich_text";
+  rich_text: RichTextItemResponse[];
+  id: string;
+}
 
 interface NotionRecord {
   id: string;
@@ -41,12 +54,12 @@ function formatPropertyValue(property: NotionPropertyValue): string {
 
   switch (property.type) {
     case 'title':
-      if (isPropertyType<TitlePropertyItemObjectResponse>(property, 'title')) {
+      if (isPropertyType<TitlePropertyValue>(property, 'title')) {
         return property.title.map(t => t.plain_text).join(' ') || '';
       }
       break;
     case 'rich_text':
-      if (isPropertyType<RichTextPropertyItemObjectResponse>(property, 'rich_text')) {
+      if (isPropertyType<RichTextPropertyValue>(property, 'rich_text')) {
         return property.rich_text.map(t => t.plain_text).join(' ') || '';
       }
       break;
