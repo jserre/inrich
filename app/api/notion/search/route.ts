@@ -23,30 +23,38 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No search query provided' }, { status: 400 });
     }
 
-    // Get database to verify access and get title
+    // Get database to verify access and get title and properties
     const database = await notion.databases.retrieve({ database_id: databaseId });
     if (!isFullDatabase(database)) {
       return NextResponse.json({ error: 'Invalid database response' }, { status: 500 });
+    }
+
+    // Build search filter for all text-based properties
+    const searchableProperties = Object.entries(database.properties)
+      .filter(([_, prop]) => ['title', 'rich_text', 'url', 'email', 'phone_number'].includes(prop.type))
+      .map(([name, prop]) => {
+        const type = prop.type as 'title' | 'rich_text' | 'url' | 'email' | 'phone_number';
+        return {
+          property: name,
+          [type]: {
+            contains: query
+          }
+        };
+      });
+
+    if (searchableProperties.length === 0) {
+      // If no searchable properties, return empty results
+      return NextResponse.json({
+        records: [],
+        title: database.title[0]?.plain_text || 'Untitled'
+      });
     }
 
     // Search records in database
     const response = await notion.databases.query({
       database_id: databaseId,
       filter: {
-        or: [
-          {
-            property: 'title',
-            title: {
-              contains: query
-            }
-          },
-          {
-            property: 'rich_text',
-            rich_text: {
-              contains: query
-            }
-          }
-        ]
+        or: searchableProperties
       }
     });
 
