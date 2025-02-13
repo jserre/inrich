@@ -141,6 +141,11 @@ export default function RecordsPage() {
     fetchRecords(searchQuery);
   };
 
+  const handleReset = () => {
+    setSearchQuery('');
+    fetchRecords();
+  };
+
   if (loading) return <div className="p-4">Loading records...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
   if (!records) return <div className="p-4">No records found</div>;
@@ -164,7 +169,7 @@ export default function RecordsPage() {
             placeholder="Search records..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
           />
           <button
             type="submit"
@@ -173,6 +178,15 @@ export default function RecordsPage() {
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            >
+              Reset
+            </button>
+          )}
         </form>
 
         {/* Records table */}
