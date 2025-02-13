@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { 
   PageObjectResponse,
   PropertyValueType,
-  RichTextItemResponse,
   SelectPropertyItemObjectResponse,
   MultiSelectPropertyItemObjectResponse,
   DatePropertyItemObjectResponse,
@@ -96,8 +95,6 @@ function formatPropertyValue(property: PropertyValueType): string {
 }
 
 export default function RecordsPage() {
-  const searchParams = useSearchParams();
-  const databaseId = searchParams.get('id');
   const [records, setRecords] = useState<RecordsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
