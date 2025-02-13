@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     return Response.json({ error: 'Missing LinkedIn profile URL' }, { status: 400 });
   }
 
-  const apiKey = process.env['X-RapidAPI-Key'];
+  const apiKey = process.env.X_RapidAPI_Key;
   if (!apiKey) {
     return Response.json({ error: 'API key not configured' }, { status: 500 });
   }
