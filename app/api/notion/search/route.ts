@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
 import { isFullDatabase, isFullPage } from '@notionhq/client';
 import { isValidDatabaseId, isValidSearchQuery, createErrorResponse } from '@/utils/validation';
-import { APIErrorCode, ClientErrorCode } from '@notionhq/client';
+import { APIErrorCode } from '@notionhq/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -66,8 +66,8 @@ export async function GET(request: NextRequest) {
         if (error.code === APIErrorCode.ObjectNotFound) {
           return createErrorResponse('Database not found', 404);
         }
-        if (error.code === ClientErrorCode.AuthenticationError) {
-          return createErrorResponse('Invalid Notion API key', 401);
+        if (error.code === APIErrorCode.ValidationError) {
+          return createErrorResponse('Invalid Notion API key or request', 401);
         }
         if (error.code === APIErrorCode.Unauthorized) {
           return createErrorResponse('You do not have access to this database. Make sure to share it with your integration.', 403);
