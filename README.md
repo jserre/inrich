@@ -1,6 +1,6 @@
-# Notion Browser & LinkedIn Viewer
+# inrich
 
-A production-ready Next.js application featuring two main integrations:
+A production-ready Next.js application that enriches your data through integrations:
 1. Notion database browsing and searching
 2. LinkedIn profile data visualization
 
