@@ -30,7 +30,7 @@ export default function LinkedInPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col p-8">
+    <main className="flex min-h-screen flex-col p-8 bg-gray-900 text-gray-100">
       <h1 className="text-2xl font-bold mb-4">LinkedIn Profile Viewer</h1>
       
       <div className="flex gap-4 mb-4">
@@ -39,32 +39,32 @@ export default function LinkedInPage() {
           value={profileUrl}
           onChange={(e) => setProfileUrl(e.target.value)}
           placeholder="Enter LinkedIn profile URL"
-          className="flex-1 p-2 border rounded"
+          className="flex-1 p-2 border rounded bg-gray-800 text-gray-100 border-gray-700"
         />
         <button
           onClick={() => fetchProfile(profileUrl)}
           disabled={loading || !profileUrl}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-700"
         >
           {loading ? 'Loading...' : 'Fetch Profile'}
         </button>
         <button
           onClick={() => fetchProfile(testProfile)}
           disabled={loading}
-          className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-gray-300"
+          className="px-4 py-2 bg-green-600 text-white rounded disabled:bg-gray-700"
         >
           Test with Sample Profile
         </button>
       </div>
 
       {error && (
-        <div className="text-red-500 mb-4">
+        <div className="text-red-400 mb-4 p-4 bg-red-900/50 rounded">
           Error: {error}
         </div>
       )}
 
       {profileData && (
-        <pre className="bg-gray-100 p-4 rounded overflow-auto">
+        <pre className="bg-gray-800 p-4 rounded overflow-auto text-gray-100 border border-gray-700">
           {JSON.stringify(profileData, null, 2)}
         </pre>
       )}
