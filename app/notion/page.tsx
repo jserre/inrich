@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ interface SchemaResponse {
   title: string;
 }
 
-export default function NotionPage() {
+function NotionContent() {
   const searchParams = useSearchParams();
   const databaseId = searchParams.get('id');
   const [schema, setSchema] = useState<SchemaResponse | null>(null);
@@ -63,5 +63,13 @@ export default function NotionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NotionPage() {
+  return (
+    <Suspense fallback={<div className="p-4">Loading...</div>}>
+      <NotionContent />
+    </Suspense>
   );
 }
