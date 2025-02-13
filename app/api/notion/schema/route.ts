@@ -1,13 +1,25 @@
 import { NextResponse } from 'next/server';
 import { getDatabaseSchema } from '@/utils/notion';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    if (!process.env.NOTION_DATABASE_ID) {
-      return NextResponse.json({ error: 'Missing NOTION_DATABASE_ID' }, { status: 500 });
+    // Try to get ID from referer first
+    const referer = request.headers.get('referer');
+    let databaseId = process.env.NOTION_DATABASE_ID;
+
+    if (referer) {
+      const url = new URL(referer);
+      const idFromUrl = url.searchParams.get('id');
+      if (idFromUrl) {
+        databaseId = idFromUrl;
+      }
     }
 
-    const schema = await getDatabaseSchema(process.env.NOTION_DATABASE_ID);
+    if (!databaseId) {
+      return NextResponse.json({ error: 'Missing database ID' }, { status: 400 });
+    }
+
+    const schema = await getDatabaseSchema(databaseId);
     return NextResponse.json(schema);
   } catch (error) {
     console.error('Error in schema route:', error);
