@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
 import { isFullDatabase, isFullPage } from '@notionhq/client';
-import { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints';
 
 export async function GET(request: NextRequest) {
   try {
@@ -52,17 +52,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Search records in database
+    const filter = {
+      or: searchableProperties
+    } satisfies QueryDatabaseParameters['filter'];
+
     const response = await notion.databases.query({
       database_id: databaseId,
-      filter: {
-        or: searchableProperties.map((filter) => ({
-          property: filter.property,
-          [Object.keys(filter).find(key => key !== 'property') as keyof typeof filter]: {
-            contains: query
-          }
-        }))
-      }
-    } as any);
+      filter
+    });
 
     // Format response
     const records = response.results.map(page => {
