@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { 
   PageObjectResponse,
-  PropertyValueType,
   SelectPropertyItemObjectResponse,
   MultiSelectPropertyItemObjectResponse,
   DatePropertyItemObjectResponse,
@@ -16,6 +15,8 @@ import {
   RichTextPropertyItemObjectResponse
 } from '@notionhq/client/build/src/api-endpoints';
 
+type NotionPropertyValue = PageObjectResponse['properties'][string];
+
 interface NotionRecord {
   id: string;
   properties: PageObjectResponse['properties'];
@@ -27,15 +28,15 @@ interface RecordsResponse {
 }
 
 // Type guard for property values
-function isPropertyType<T extends PropertyValueType>(
-  property: PropertyValueType,
+function isPropertyType<T extends NotionPropertyValue>(
+  property: NotionPropertyValue,
   type: T['type']
 ): property is T {
   return property.type === type;
 }
 
 // Strongly typed property formatter
-function formatPropertyValue(property: PropertyValueType): string {
+function formatPropertyValue(property: NotionPropertyValue): string {
   if (!property) return '';
 
   switch (property.type) {
