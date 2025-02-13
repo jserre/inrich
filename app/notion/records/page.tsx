@@ -112,13 +112,15 @@ export default function RecordsPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = new URLSearchParams(window.location.search);
+  const databaseId = searchParams.get('id');
 
   const fetchRecords = async (query?: string) => {
     try {
       setLoading(true);
       const endpoint = query 
-        ? `/api/notion/search?query=${encodeURIComponent(query)}`
-        : '/api/notion/records';
+        ? `/api/notion/search?databaseId=${databaseId}&query=${encodeURIComponent(query)}`
+        : `/api/notion/records?id=${databaseId}`;
       const response = await fetch(endpoint);
       if (!response.ok) throw new Error('Failed to fetch records');
       const data = await response.json();
