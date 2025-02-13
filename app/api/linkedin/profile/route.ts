@@ -12,8 +12,11 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Debug logging
+    console.log('Fetching profile:', profileUrl);
+    
     const response = await fetch(
-      `https://rapidapi.com/get-profile-data-by-url?url=${encodeURIComponent(profileUrl)}`,
+      `https://linkedin-api8.p.rapidapi.com/get-profile-data-by-url?url=${encodeURIComponent(profileUrl)}`,
       {
         headers: {
           'x-rapidapi-key': apiKey,
@@ -21,6 +24,16 @@ export async function GET(request: Request) {
         }
       }
     );
+
+    if (!response.ok) {
+      console.error('API error:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      return Response.json({ error: `API error: ${response.status} ${response.statusText}` }, { status: response.status });
+    }
 
     const data = await response.json();
     return Response.json(data);
