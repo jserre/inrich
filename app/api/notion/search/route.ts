@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notion } from '@/utils/notion';
-import { isFullDatabase } from '@notionhq/client';
+import { isFullDatabase, isFullPage } from '@notionhq/client';
+import { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
 export async function GET(request: NextRequest) {
   try {
@@ -54,15 +55,25 @@ export async function GET(request: NextRequest) {
     const response = await notion.databases.query({
       database_id: databaseId,
       filter: {
-        or: searchableProperties
+        or: searchableProperties.map((filter) => ({
+          property: filter.property,
+          [Object.keys(filter).find(key => key !== 'property') as keyof typeof filter]: {
+            contains: query
+          }
+        }))
       }
-    });
+    } as any);
 
     // Format response
-    const records = response.results.map(page => ({
-      id: page.id,
-      properties: page.properties
-    }));
+    const records = response.results.map(page => {
+      if (!isFullPage(page)) {
+        throw new Error('Received incomplete page response');
+      }
+      return {
+        id: page.id,
+        properties: page.properties
+      };
+    });
 
     return NextResponse.json({
       records,
