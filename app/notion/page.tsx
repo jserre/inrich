@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 type NotionPropertyConfig = DatabaseObjectResponse['properties'][string];
 
@@ -11,6 +13,8 @@ interface SchemaResponse {
 }
 
 export default function NotionPage() {
+  const searchParams = useSearchParams();
+  const databaseId = searchParams.get('id');
   const [schema, setSchema] = useState<SchemaResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +42,15 @@ export default function NotionPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Database: {schema.title}</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Database: {schema.title}</h1>
+        <Link 
+          href={`/notion/records?id=${databaseId}`}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          View Records
+        </Link>
+      </div>
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Properties:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
