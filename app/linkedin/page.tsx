@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 
 interface LinkedInProfile {
   firstName?: string;
@@ -102,11 +101,10 @@ export default function LinkedInPage() {
           <div className="flex items-start gap-6 bg-gray-800 p-6 rounded-lg">
             {profileData.profilePicture && (
               <div className="relative w-32 h-32 rounded-full overflow-hidden flex-shrink-0">
-                <Image 
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
                   src={profileData.profilePicture} 
                   alt="Profile" 
-                  width={128} 
-                  height={128} 
                   className="object-cover"
                 />
               </div>
