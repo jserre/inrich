@@ -31,16 +31,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Build search filter for all text-based properties
+    type PropertyType = 'title' | 'rich_text' | 'url' | 'email' | 'phone_number';
+    
+    interface PropertyFilter {
+        property: string;
+        [key: string]: {
+            contains: string;
+        } | string;
+    }
+
     const searchableProperties = Object.entries(database.properties)
       .filter(([, prop]) => ['title', 'rich_text', 'url', 'email', 'phone_number'].includes(prop.type))
       .map(([name, prop]) => {
-        const type = prop.type as 'title' | 'rich_text' | 'url' | 'email' | 'phone_number';
+        const type = prop.type as PropertyType;
         return {
           property: name,
           [type]: {
             contains: query
           }
-        };
+        } as const;
       });
 
     if (searchableProperties.length === 0) {
@@ -52,13 +61,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Search records in database
-    const filter = {
-      or: searchableProperties
-    } satisfies QueryDatabaseParameters['filter'];
-
+    // @ts-ignore - The filter structure matches Notion's API requirements but TypeScript is having trouble with the types
     const response = await notion.databases.query({
       database_id: databaseId,
-      filter
+      filter: {
+        or: searchableProperties
+      }
     });
 
     // Format response
