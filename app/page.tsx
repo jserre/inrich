@@ -2,11 +2,12 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import ProfileViewer from './components/ProfileViewer';
 
-export default function Home({
-  searchParams,
-}: {
+interface PageProps {
+  params: { [key: string]: string | string[] | undefined };
   searchParams: { [key: string]: string | string[] | undefined };
-}) {
+}
+
+export default function Home({ searchParams }: PageProps) {
   const profileUrl = searchParams.p as string | undefined;
 
   if (profileUrl) {
