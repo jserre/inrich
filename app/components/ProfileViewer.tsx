@@ -38,7 +38,7 @@ export default function ProfileViewer({ profileUrl }: { profileUrl: string }) {
         }
 
         setProfile(data);
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setError('An unexpected error occurred while fetching the profile');
         }
