@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
     };
     
     return NextResponse.json(sanitizedData);
-  } catch (error) {
+  } catch {
     // Return a generic error without exposing internal details
     return NextResponse.json(
       { error: 'An error occurred while fetching the profile. Please try again later.' },
