@@ -3,11 +3,12 @@ import { Suspense } from 'react';
 import ProfileViewer from './components/ProfileViewer';
 
 interface PageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function Home({ searchParams }: PageProps) {
-  const profileUrl = searchParams.p as string | undefined;
+  const params = await searchParams;
+  const profileUrl = params.p as string | undefined;
 
   if (profileUrl) {
     return (
