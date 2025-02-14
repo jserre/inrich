@@ -2,7 +2,7 @@
 
 A production-ready Next.js application that enriches your data through integrations:
 1. Notion database browsing and searching
-2. LinkedIn profile data visualization
+2. LinkedIn profile data visualization (In Progress)
 
 ## Production Status
 
@@ -15,12 +15,12 @@ This application is **STABLE** and deployed in production. Current stable featur
 - Search records by title within any database
 - Real-time search results with clean interface
 
-### LinkedIn Integration
-- Fetch and display LinkedIn profile data
-- Beautiful dark-themed UI
-- Support for profile picture, experience, education, and skills
-- Graceful error handling and loading states
-- Raw JSON data toggle for debugging
+### LinkedIn Integration (In Progress)
+- Fetch and display LinkedIn profile data (Coming soon)
+- Beautiful dark-themed UI (Coming soon)
+- Support for profile picture, experience, education, and skills (Coming soon)
+- Graceful error handling and loading states (Coming soon)
+- Raw JSON data toggle for debugging (Coming soon)
 
 ## Technical Stack
 
