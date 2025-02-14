@@ -7,7 +7,24 @@ interface LinkedInProfile {
   firstName?: string;
   lastName?: string;
   headline?: string;
+  summary?: string;
   profilePicture?: string;
+  location?: string;
+  positions?: Array<{
+    title: string;
+    company: string;
+    startDate: string;
+    endDate?: string;
+    description?: string;
+  }>;
+  education?: Array<{
+    school: string;
+    degree?: string;
+    field?: string;
+    startDate?: string;
+    endDate?: string;
+  }>;
+  skills?: string[];
   error?: string;
 }
 
@@ -31,7 +48,6 @@ export default function ProfileViewer({ profileUrl }: { profileUrl: string }) {
           return;
         }
         
-        // Type guard for profile data
         if (!data || typeof data !== 'object') {
           setError('Invalid response format');
           return;
@@ -66,7 +82,7 @@ export default function ProfileViewer({ profileUrl }: { profileUrl: string }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-lg w-full">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6">
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="w-16 h-16 text-red-500">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -95,34 +111,104 @@ export default function ProfileViewer({ profileUrl }: { profileUrl: string }) {
   const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'Unknown User';
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full space-y-6">
-      <div className="flex flex-col items-center space-y-4">
-        <div className="relative w-32 h-32">
+    <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl w-full space-y-8">
+      {/* Header section with profile picture and basic info */}
+      <div className="flex items-start space-x-6">
+        <div className="relative w-32 h-32 flex-shrink-0">
           <Image
-            src={profile.profilePicture || '/images/defaultavatar.png'}
+            src={profile.profilePicture || '/images/default-avatar.png'}
             alt={`${fullName}'s profile picture`}
             fill
-            sizes="(max-width: 128px) 100vw, 128px"
             className="rounded-full object-cover"
-            priority
+            sizes="(max-width: 128px) 100vw, 128px"
           />
         </div>
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-gray-900">{fullName}</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{fullName}</h1>
           {profile.headline && (
-            <p className="text-gray-600 mt-1">{profile.headline}</p>
+            <p className="text-xl text-gray-600 mt-1">{profile.headline}</p>
+          )}
+          {profile.location && (
+            <p className="text-gray-500 mt-2">{profile.location}</p>
           )}
         </div>
       </div>
-      
-      <button 
-        type="button"
-        onClick={() => {}} // To be implemented later
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:bg-blue-800"
-        aria-label="Add profile to Notion"
-      >
-        Add to Notion?
-      </button>
+
+      {/* Summary section */}
+      {profile.summary && (
+        <section className="border-t pt-6">
+          <h2 className="text-2xl font-semibold mb-4">About</h2>
+          <p className="text-gray-700 whitespace-pre-wrap">{profile.summary}</p>
+        </section>
+      )}
+
+      {/* Experience section */}
+      {profile.positions && profile.positions.length > 0 && (
+        <section className="border-t pt-6">
+          <h2 className="text-2xl font-semibold mb-4">Experience</h2>
+          <div className="space-y-6">
+            {profile.positions.map((position, index) => (
+              <div key={index} className="space-y-2">
+                <h3 className="text-xl font-medium text-gray-900">{position.title}</h3>
+                <p className="text-gray-600">{position.company}</p>
+                <p className="text-gray-500">
+                  {position.startDate} - {position.endDate || 'Present'}
+                </p>
+                {position.description && (
+                  <p className="text-gray-700 mt-2">{position.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Education section */}
+      {profile.education && profile.education.length > 0 && (
+        <section className="border-t pt-6">
+          <h2 className="text-2xl font-semibold mb-4">Education</h2>
+          <div className="space-y-6">
+            {profile.education.map((edu, index) => (
+              <div key={index} className="space-y-1">
+                <h3 className="text-xl font-medium text-gray-900">{edu.school}</h3>
+                {edu.degree && edu.field && (
+                  <p className="text-gray-600">{edu.degree} - {edu.field}</p>
+                )}
+                {edu.startDate && (
+                  <p className="text-gray-500">
+                    {edu.startDate} - {edu.endDate || 'Present'}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Skills section */}
+      {profile.skills && profile.skills.length > 0 && (
+        <section className="border-t pt-6">
+          <h2 className="text-2xl font-semibold mb-4">Skills</h2>
+          <div className="flex flex-wrap gap-2">
+            {profile.skills.map((skill, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="border-t pt-6 flex justify-end">
+        <button 
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Add to Notion
+        </button>
+      </div>
     </div>
   );
 }

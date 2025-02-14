@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import ProfileViewer from './components/ProfileViewer';
+import MiniProfileViewer from './components/MiniProfileViewer';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: PageProps) {
     return (
       <main className="min-h-screen flex items-center justify-center p-4">
         <Suspense fallback={<div>Loading...</div>}>
-          <ProfileViewer profileUrl={profileUrl} />
+          <MiniProfileViewer profileUrl={profileUrl} />
         </Suspense>
       </main>
     );
