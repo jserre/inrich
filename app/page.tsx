@@ -1,6 +1,24 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
+import ProfileViewer from './components/ProfileViewer';
 
-export default function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const profileUrl = searchParams.p as string | undefined;
+
+  if (profileUrl) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-4">
+        <Suspense fallback={<div>Loading...</div>}>
+          <ProfileViewer profileUrl={profileUrl} />
+        </Suspense>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen flex items-center justify-center">
       <div className="text-center">

@@ -1,20 +1,28 @@
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const profileUrl = searchParams.get('url');
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-  if (!profileUrl) {
-    return Response.json({ error: 'Missing LinkedIn profile URL' }, { status: 400 });
-  }
+export const runtime = 'edge'; // Opt for edge runtime for better performance
 
-  const apiKey = process.env.X_RapidAPI_Key;
-  if (!apiKey) {
-    return Response.json({ error: 'API key not configured' }, { status: 500 });
-  }
-
+export async function GET(request: NextRequest) {
   try {
-    // Debug logging
-    console.log('Fetching profile:', profileUrl);
-    
+    const { searchParams } = new URL(request.url);
+    const profileUrl = searchParams.get('url');
+
+    if (!profileUrl?.startsWith('https://www.linkedin.com/in/')) {
+      return NextResponse.json(
+        { error: 'Invalid LinkedIn profile URL. Must start with https://www.linkedin.com/in/' },
+        { status: 400 }
+      );
+    }
+
+    const apiKey = process.env.X_RapidAPI_Key;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
     const response = await fetch(
       `https://linkedin-api8.p.rapidapi.com/get-profile-data-by-url?url=${encodeURIComponent(profileUrl)}`,
       {
@@ -23,22 +31,66 @@ export async function GET(request: Request) {
           'x-rapidapi-host': 'linkedin-api8.p.rapidapi.com'
         }
       }
-    );
+    ).catch(() => null);
 
-    if (!response.ok) {
-      console.error('API error:', {
-        status: response.status,
-        statusText: response.statusText
-      });
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      return Response.json({ error: `API error: ${response.status} ${response.statusText}` }, { status: response.status });
+    if (!response) {
+      return NextResponse.json(
+        { error: 'Failed to connect to LinkedIn API' },
+        { status: 503 }
+      );
     }
 
-    const data = await response.json();
-    return Response.json(data);
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      // Handle 404 specifically for profile not found
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: 'Profile not found. Please check if the LinkedIn URL is correct and the profile is public.' },
+          { status: 404 }
+        );
+      }
+      
+      // Handle other API errors
+      return NextResponse.json(
+        { 
+          error: response.status === 403 
+            ? 'Unable to access this profile. The profile might be private or require authentication.'
+            : 'Unable to fetch profile data. Please try again later.'
+        },
+        { status: response.status }
+      );
+    }
+
+    if (!data || typeof data !== 'object') {
+      return NextResponse.json(
+        { error: 'Invalid response from LinkedIn API' },
+        { status: 502 }
+      );
+    }
+
+    // Validate that we have at least some basic profile data
+    if (!data.firstName && !data.lastName && !data.headline) {
+      return NextResponse.json(
+        { error: 'No profile data available. The profile might be private or require authentication.' },
+        { status: 404 }
+      );
+    }
+
+    // Sanitize the response to only include what we need
+    const sanitizedData = {
+      firstName: data.firstName || '',
+      lastName: data.lastName || '',
+      headline: data.headline || '',
+      profilePicture: typeof data.profilePicture === 'string' ? data.profilePicture : undefined
+    };
+    
+    return NextResponse.json(sanitizedData);
   } catch (error) {
-    console.error('LinkedIn API error:', error);
-    return Response.json({ error: 'Failed to fetch profile data' }, { status: 500 });
+    // Return a generic error without exposing internal details
+    return NextResponse.json(
+      { error: 'An error occurred while fetching the profile. Please try again later.' },
+      { status: 500 }
+    );
   }
 }

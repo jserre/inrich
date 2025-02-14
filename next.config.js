@@ -1,7 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['media.licdn.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
+  typescript: {
+    ignoreBuildErrors: false, // Enforce strict TypeScript checking
+  },
+  eslint: {
+    ignoreDuringBuilds: false, // Enforce ESLint rules
   },
 }
 
