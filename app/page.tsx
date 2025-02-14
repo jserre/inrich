@@ -8,7 +8,7 @@ interface PageProps {
 }
 
 export default async function Home({ params, searchParams }: PageProps) {
-  const profileUrl = (await params).p as string | undefined;
+  const profileUrl = searchParams.p as string | undefined;
 
   if (profileUrl) {
     return (
