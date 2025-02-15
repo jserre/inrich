@@ -9,7 +9,7 @@ export default function Home() {
         <div className="space-y-4">
           <div>
             <Link 
-              href="/databases" 
+              href="/notion/databases-list" 
               className="text-blue-500 hover:text-blue-700 underline"
             >
               View Your Databases →

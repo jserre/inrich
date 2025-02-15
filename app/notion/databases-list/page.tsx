@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { listDatabases } from '../../utils/notion';
+import { listDatabases } from '../../../utils/notion';
 
 export default async function DatabasesPage() {
   try {
